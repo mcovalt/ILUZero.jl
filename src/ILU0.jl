@@ -18,7 +18,7 @@ module ILU0
     end
 
     # Allocates ILU0Precon type
-    function allocILU0Precon{T<:Real,N<:Integer}(A::SparseMatrixCSC{T,N})
+    function ILU0Precon{T<:Real,N<:Integer}(A::SparseMatrixCSC{T,N})
         m, n = size(A)
 
         # Determine number of elements in lower/upper
@@ -124,7 +124,7 @@ module ILU0
 
     # Constructs ILU0Precon type based on matrix A
     function ilu0{T<:Real,N<:Integer}(A::SparseMatrixCSC{T,N})
-        LU = allocILU0Precon(A)
+        LU = ILU0Precon(A)
         ilu0!(LU, A)
         return LU
     end
