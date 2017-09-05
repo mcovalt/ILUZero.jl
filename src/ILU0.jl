@@ -86,8 +86,13 @@ module ILU0
 
         # Redundant data or better speed... speed is chosen, but this might be changed.
         # This shouldn't be inbounded either.
-        l_nzval .= A.nzval[l_map]
-        u_nzval .= A.nzval[u_map]
+        for i = 1:length(l_map)
+            l_nzval[i] = A.nzval[l_map[i]]
+        end
+        for i = 1:length(u_map)
+            u_nzval[i] = A.nzval[u_map[i]]
+        end
+
 
         @inbounds for i = 1:m-1
             multiplier = u_nzval[u_colptr[i+1] - 1]
