@@ -1,6 +1,6 @@
 # ILU0.jl
 
-`ILU0.jl` is a Julia implementation of incomplete LU factorization with zero level of fill in. The module is compatible with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl).
+`ILU0.jl` is a Julia implementation of incomplete LU factorization with zero level of fill-in. It allows for non-allocating updates of the factorization. The module is compatible with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl).
 
 ## Requirements
 
