@@ -1,6 +1,6 @@
 # ILU0.jl
 
-`ILU0.jl` is a Julia implementation of incomplete LU factorization with zero level of fill in. The module is compatible with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl).
+`ILU0.jl` is a Julia implementation of incomplete LU factorization with zero level of fill-in. It allows for non-allocating updates of the factorization. The module is compatible with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl).
 
 ## Requirements
 
@@ -28,7 +28,7 @@ julia> using ILU0
 
 * `LU = ilu0(A)`: Create a factorization based on a sparse matrix `A`
 * `ilu0!(LU, A)`: Update factorization `LU` in-place based on a sparse matrix `A`. This assumes the original factorization was created with another sparse matrix with the exact same sparsity pattern as `A`. No check is made for this.
-* To solve for `x` in `(LU)x=b`, use the same methods as you typically would: `\`, `A_ldiv_B!(x, LU, b)`, `A_ldiv_B!(LU, b)`. See [the docs](https://docs.julialang.org/en/stable/stdlib/linalg/) for further information.
+* To solve for `x` in `(LU)x=b`, use the same methods as you typically would: `\` or `A_ldiv_B!(x, LU, b)`. See [the docs](https://docs.julialang.org/en/stable/stdlib/linalg/) for further information.
 
 ## Performance
 
