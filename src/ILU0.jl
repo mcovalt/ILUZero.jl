@@ -39,8 +39,8 @@ module ILU0
         u_colptr = zeros(N, n+1)
         l_nzval = zeros(T, lnz)
         u_nzval = zeros(T, unz)
-        l_rowval = zeros(Int, lnz)
-        u_rowval = zeros(Int, unz)
+        l_rowval = zeros(Int64, lnz)
+        u_rowval = zeros(Int64, unz)
         l_map = Vector{N}(lnz)
         u_map = Vector{N}(unz)
         wrk = zeros(T, n)
@@ -86,12 +86,8 @@ module ILU0
 
         # Redundant data or better speed... speed is chosen, but this might be changed.
         # This shouldn't be inbounded either.
-        for i = 1:length(l_map)
-            l_nzval[i] = A.nzval[l_map[i]]
-        end
-        for i = 1:length(l_map)
-            u_nzval[i] = A.nzval[u_map[i]]
-        end
+        l_nzval .= A.nzval[l_map]
+        u_nzval .= A.nzval[u_map]
 
         @inbounds for i = 1:m-1
             multiplier = u_nzval[u_colptr[i+1] - 1]
