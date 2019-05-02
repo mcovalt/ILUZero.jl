@@ -134,8 +134,8 @@ module ILU0
     end
 
     import LinearAlgebra: ldiv!
-    # Solves LU\b overwriting b
-    function ldiv!(LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
+    # Solves LU\b overwriting x
+    function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
         (length(b) == LU.n) || throw(DimensionMismatch())
         n = LU.n
         l_colptr = LU.l_colptr
@@ -155,17 +155,16 @@ module ILU0
             end
         end
         @inbounds for i = n:-1:1
-            b[i] = wrk[i]/u_nzval[u_colptr[i+1]-1]
+            x[i] = wrk[i]/u_nzval[u_colptr[i+1]-1]
             for j = u_colptr[i]:u_colptr[i+1]-2
-                wrk[u_rowval[j]] -= u_nzval[j]*b[i]
+                wrk[u_rowval[j]] -= u_nzval[j]*x[i]
             end
         end
     end
 
-    # Solves Lu\b overwriting x
-    function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
-        x .= b
-        ldiv!(LU, x)
+    # Solves Lu\b overwriting b
+    function ldiv!(LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
+        ldiv!(b, LU, b)
     end
 
     import Base: \
@@ -173,7 +172,7 @@ module ILU0
     function \(LU::ILU0Precon{T,N}, b::Vector{T}) where {T<:Real,N<:Integer}
         length(b) == LU.n || throw(DimensionMismatch())
         x = zeros(T, length(b))
-        A_ldiv_B!(x, LU, b)
+        ldiv!(x, LU, b)
         return x
     end
 

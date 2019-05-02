@@ -7,12 +7,12 @@ function test_solve()
     n = 100
     tA = sprandn(n,n,.1) + 10.0*I
     A = tA'*tA
-    LU = ilu0(A)
+    ilu_prec = ilu0(A)
     b = rand(n)
     x, ch = cg(A, b, log=true)
     nocon_niter = ch.iters
     println("No preconditioning: ", nocon_niter, " iterations")
-    x, ch = cg(A, b, Pl=LU, log=true)
+    x, ch = cg(A, b, Pl=ilu_prec, log=true)
     con_niter = ch.iters
     println("Preconditioned: ", con_niter, " iterations")
     if nocon_niter > con_niter
