@@ -1,9 +1,8 @@
 module ILU0
-    # Overloaded functions
-    import Base: \, A_ldiv_B!
+    using LinearAlgebra, SparseArrays
 
     # ILU0 type definition
-    immutable ILU0Precon{T<:Real,N<:Integer} <: Factorization{T}
+    struct ILU0Precon{T<:Real,N<:Integer} <: Factorization{T}
         m::N
         n::N
         l_colptr::Vector{N}
@@ -18,7 +17,7 @@ module ILU0
     end
 
     # Allocates ILU0Precon type
-    function ILU0Precon{T<:Real,N<:Integer}(A::SparseMatrixCSC{T,N})
+    function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T<:Real, N<:Integer}
         m, n = size(A)
 
         # Determine number of elements in lower/upper
@@ -41,8 +40,8 @@ module ILU0
         u_nzval = zeros(T, unz)
         l_rowval = zeros(Int64, lnz)
         u_rowval = zeros(Int64, unz)
-        l_map = Vector{N}(lnz)
-        u_map = Vector{N}(unz)
+        l_map = Vector{N}(undef, lnz)
+        u_map = Vector{N}(undef, unz)
         wrk = zeros(T, n)
         l_colptr[1] = 1
         u_colptr[1] = 1
@@ -72,7 +71,7 @@ module ILU0
     end
 
     # Updates ILU0Precon type in-place based on matrix A
-    function ilu0!{T<:Real,N<:Integer}(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N})
+    function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T<:Real, N<:Integer}
         m = LU.m
         n = LU.n
         l_colptr = LU.l_colptr
@@ -128,14 +127,14 @@ module ILU0
     end
 
     # Constructs ILU0Precon type based on matrix A
-    function ilu0{T<:Real,N<:Integer}(A::SparseMatrixCSC{T,N})
+    function ilu0(A::SparseMatrixCSC{T,N}) where {T<:Real,N<:Integer}
         LU = ILU0Precon(A)
         ilu0!(LU, A)
         return LU
     end
 
     # Solves LU\b overwriting x
-    function A_ldiv_B!{T<:Real,N<:Integer}(x::Vector{T}, LU::ILU0Precon{T,N}, b::Vector{T})
+    function A_ldiv_B!(x::Vector{T}, LU::ILU0Precon{T,N}, b::Vector{T}) where {T<:Real,N<:Integer}
         (length(b) == LU.n && length(x) == LU.n) || throw(DimensionMismatch())
         n = LU.n
         l_colptr = LU.l_colptr
@@ -164,8 +163,9 @@ module ILU0
         return
     end
 
+    import Base: \
     # Returns LU\b
-    function \{T<:Real,N<:Integer}(LU::ILU0Precon{T,N}, b::Vector{T})
+    function \(LU::ILU0Precon{T,N}, b::Vector{T}) where {T<:Real,N<:Integer}
         length(b) == LU.n || throw(DimensionMismatch())
         x = zeros(T, length(b))
         A_ldiv_B!(x, LU, b)
