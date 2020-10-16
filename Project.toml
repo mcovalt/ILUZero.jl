@@ -1,5 +1,6 @@
 name = "ILU0"
 uuid = "88f59080-6952-5380-9ea5-54057fb9a43f"
+version = "0.1.0"
 
 [deps]
 IterativeSolvers = "42fd0dbc-a981-5370-80f2-aaf504508153"
