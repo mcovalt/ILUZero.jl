@@ -1,9 +1,9 @@
 module ILU0
     using LinearAlgebra, SparseArrays
 
-    import LinearAlgebra.ldiv!, LinearAlgebra.\
+    import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
 
-    export ILU0Precon, \, forward_substitution, backward_substitution, ldiv!, ilu0, ilu0!
+    export ILU0Precon, \, forward_substitution, backward_substitution, nnz, ldiv!, ilu0, ilu0!
 
     # ILU0 type definition
     struct ILU0Precon{T<:Real,N<:Integer} <: Factorization{T}
@@ -213,6 +213,11 @@ module ILU0
         length(b) == LU.n || throw(DimensionMismatch())
         x = zeros(T, length(b))
         ldiv!(x, LU, b)
+    end
+
+    # Returns the number of nonzero
+    function nnz(LU::ILU0Precon{T,N}) where {T<:Real,N<:Integer}
+        return length(LU.u_nzval) + length(LU.u_nzval)
     end
 
 end
