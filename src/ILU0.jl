@@ -217,7 +217,7 @@ module ILU0
 
     # Returns the number of nonzero
     function nnz(LU::ILU0Precon{T,N}) where {T<:Real,N<:Integer}
-        return length(LU.u_nzval) + length(LU.u_nzval)
+        return length(LU.l_nzval) + length(LU.u_nzval)
     end
 
 end
