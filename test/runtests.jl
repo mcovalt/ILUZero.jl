@@ -1,4 +1,4 @@
-#Start Test Script
+# Start Test Script
 using ILU0, LinearAlgebra, SparseArrays, Test
 
 function cg(A, b; M=I)
@@ -31,7 +31,7 @@ end
 
 function test_solve()
     n = 100
-    tA = sprandn(n,n,.1) + 10.0*I
+    tA = sprandn(n, n, .1) + 10.0 * I
     A = tA' * tA
     ilu_prec = ilu0(A)
     b = rand(n)
@@ -44,7 +44,7 @@ end
 
 function test_substitutions()
     n = 100
-    tA = sprandn(n,n,.1) + 10.0*I
+    tA = sprandn(n, n, .1) + 10.0 * I
     A = tA' * tA
     ilu_prec = ilu0(A)
     b = rand(n)
