@@ -3,7 +3,7 @@ using LinearAlgebra, SparseArrays
 
 import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
 
-export ILU0Precon, \, forward_substitution, backward_substitution, nnz, ldiv!, ilu0, ilu0!
+export ILU0Precon, \, forward_substitution!, backward_substitution!, nnz, ldiv!, ilu0, ilu0!
 
 # ILU0 type definition
 struct ILU0Precon{T <: Real,N <: Integer} <: Factorization{T}
@@ -138,7 +138,7 @@ function ilu0(A::SparseMatrixCSC{T,N}) where {T <: Real,N <: Integer}
 end
 
 # Solves L\b and stores the solution in y
-function forward_substitution(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Real,N <: Integer}
+function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Real,N <: Integer}
     n = LU.n
     l_colptr = LU.l_colptr
     l_rowval = LU.l_rowval
@@ -156,7 +156,7 @@ function forward_substitution(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::Abst
 end
 
 # Solves U\y and stores the solution in x
-function backward_substitution(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T <: Real,N <: Integer}
+function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T <: Real,N <: Integer}
     n = LU.n
     u_colptr = LU.u_colptr
     u_rowval = LU.u_rowval

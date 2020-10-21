@@ -51,8 +51,8 @@ function test_substitutions()
     x = ilu_prec \ b
     x1 = zeros(n)
     x2 = zeros(n)
-    forward_substitution(x1, ilu_prec, b)
-    backward_substitution(x2, ilu_prec, x1)
+    forward_substitution!(x1, ilu_prec, b)
+    backward_substitution!(x2, ilu_prec, x1)
     return (x2 == x)
 end
 
