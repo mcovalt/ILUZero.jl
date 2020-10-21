@@ -1,5 +1,5 @@
 # Start Test Script
-using ILU0, LinearAlgebra, SparseArrays, Test
+using ILUZero, LinearAlgebra, SparseArrays, Test
 
 function cg(A, b; M=I)
     n = size(A, 1)

@@ -1,4 +1,4 @@
-module ILU0
+module ILUZero
 using LinearAlgebra, SparseArrays
 
 import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
