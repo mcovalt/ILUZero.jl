@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* Julia 0.6 and up
+* Julia 1.0 and up
 
 ## Instalation
 
