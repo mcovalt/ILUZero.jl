@@ -14,11 +14,9 @@ julia> Pkg.clone("https://github.com/mcovalt/ILU0.jl.git")
 
 ## Why use ILU0.jl?
 
-You probably shouldn't (thus the unregistered status of the module). Julia's built in factorization methods are much better. Julia uses [SuiteSparse](http://faculty.cse.tamu.edu/davis/suitesparse.html) for sparse matrix factorization which factorizes at about nearly the same speed and results in similarly sized preconditioners which are *much* more robust. In addition, Julia uses heuristics to determine a good factorization scheme for your matrix automatically.
+You probably shouldn't. Julia's built in factorization methods are much better. Julia uses [SuiteSparse](http://faculty.cse.tamu.edu/davis/suitesparse.html) for sparse matrix factorization which factorizes at about nearly the same speed and results in similarly sized preconditioners which are *much* more robust. In addition, Julia uses heuristics to determine a good factorization scheme for your matrix automatically.
 
-However, SuiteSparse is a compiled language that does not play nicely with the `Dual` number type found in [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl). That's why this was created.
-
-The package [ILU.jl](https://github.com/haampie/ILU.jl) is also written in pure Julia and ought to be compatible with ForwardDiff.jl as well. It allows a drop tolerance to be set so the fill-in of the preconditioner can be above zero which ought to result in a more robust preconditioner. Due to the zero-fill of this package, however, factorization should be a bit faster and preconditioners can be preallocated if updated by a matrix of identical sparsity.
+Due to the zero-fill of this package, however, factorization should be a bit faster and preconditioners can be preallocated if updated by a matrix of identical sparsity.
 
 ## How to use
 
