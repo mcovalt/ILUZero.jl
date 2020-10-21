@@ -1,6 +1,10 @@
 module ILU0
     using LinearAlgebra, SparseArrays
 
+    import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
+
+    export ILU0Precon, \, forward_substitution, backward_substitution, nnz, ldiv!, ilu0, ilu0!
+
     # ILU0 type definition
     struct ILU0Precon{T<:Real,N<:Integer} <: Factorization{T}
         m::N
@@ -133,7 +137,43 @@ module ILU0
         return LU
     end
 
-    import LinearAlgebra: ldiv!
+    # Solves L\b and stores the solution in y
+    function forward_substitution(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
+        n = LU.n
+        l_colptr = LU.l_colptr
+        l_rowval = LU.l_rowval
+        l_nzval  = LU.l_nzval
+
+        y .= zero(T)
+
+        @inbounds for i = 1:n
+            y[i] += b[i]
+            for j = l_colptr[i]:l_colptr[i+1]-1
+                y[l_rowval[j]] -= l_nzval[j]*y[i]
+            end
+        end
+        return y
+    end
+
+    # Solves U\y and stores the solution in x
+    function backward_substitution(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T<:Real,N<:Integer}
+        n = LU.n
+        u_colptr = LU.u_colptr
+        u_rowval = LU.u_rowval
+        u_nzval = LU.u_nzval
+
+        wrk = LU.wrk
+        wrk .= y
+
+        @inbounds for i = n:-1:1
+            x[i] = wrk[i]/u_nzval[u_colptr[i+1]-1]
+            for j = u_colptr[i]:u_colptr[i+1]-2
+                wrk[u_rowval[j]] -= u_nzval[j]*x[i]
+            end
+        end
+        return x
+    end
+
     # Solves LU\b overwriting x
     function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
         (length(b) == LU.n) || throw(DimensionMismatch())
@@ -146,7 +186,7 @@ module ILU0
         u_nzval = LU.u_nzval
         wrk = LU.wrk
 
-        wrk .= 0.0
+        wrk .= zero(T)
 
         @inbounds for i = 1:n
             wrk[i] += b[i]
@@ -160,21 +200,24 @@ module ILU0
                 wrk[u_rowval[j]] -= u_nzval[j]*x[i]
             end
         end
+        return x
     end
 
-    # Solves Lu\b overwriting b
+    # Solves LU\b overwriting b
     function ldiv!(LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T<:Real,N<:Integer}
         ldiv!(b, LU, b)
     end
 
-    import Base: \
     # Returns LU\b
     function \(LU::ILU0Precon{T,N}, b::Vector{T}) where {T<:Real,N<:Integer}
         length(b) == LU.n || throw(DimensionMismatch())
         x = zeros(T, length(b))
         ldiv!(x, LU, b)
-        return x
     end
 
-    export ILU0Precon, \, A_ldiv_B!, ilu0, ilu0!
+    # Returns the number of nonzero
+    function nnz(LU::ILU0Precon{T,N}) where {T<:Real,N<:Integer}
+        return length(LU.l_nzval) + length(LU.u_nzval)
+    end
+
 end
