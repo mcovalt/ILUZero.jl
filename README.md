@@ -27,6 +27,10 @@ julia> using ILU0
 * `LU = ilu0(A)`: Create a factorization based on a sparse matrix `A`
 * `ilu0!(LU, A)`: Update factorization `LU` in-place based on a sparse matrix `A`. This assumes the original factorization was created with another sparse matrix with the exact same sparsity pattern as `A`. No check is made for this.
 * To solve for `x` in `(LU)x=b`, use the same methods as you typically would: `\` or `ldiv!(x, LU, b)`. See [the docs](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) for further information.
+* There's also:
+  - Forward substitution: `forward_substitution!(y, LU, b)` solves `L\b` and stores the solution in y.
+  - Backward substitution: `backward_substitution!(x, LU, y)` solves `U\y` and stores the solution in y.
+  - Nonzero count: `nnz(LU)` will return the number of nonzero entries in `LU`
 
 ## Performance
 
