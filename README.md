@@ -34,10 +34,10 @@ julia> using ILU0
 
 ```julia
 julia> using ILU0
-julia> using BenchmarkTools
+julia> using BenchmarkTools, LinearAlgebra, SparseArrays
 julia> A = sprand(1000, 1000, 5 / 1000) + 10I
 julia> fact = @btime ilu0(A)
-       158.973 μs (16 allocations: 164.94 KiB)
+       107.600 μs (16 allocations: 160.81 KiB)
 julia> updated_fact = @btime ilu0!($fact, $A)
-       105.015 μs (0 allocations: 0 bytes)
+       71.500 μs (0 allocations: 0 bytes)
 ```
