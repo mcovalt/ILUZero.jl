@@ -6,10 +6,11 @@
 
 * Julia 1.0 and up
 
-## Instalation
+## Installation
 
 ```julia
-julia> Pkg.clone("https://github.com/mcovalt/ILUZero.jl.git")
+julia> ]
+pkg> add ILUZero
 ```
 
 ## Why use ILUZero.jl?
@@ -29,8 +30,8 @@ julia> using ILUZero
 * To solve for `x` in `(LU)x=b`, use the same methods as you typically would: `\` or `ldiv!(x, LU, b)`. See [the docs](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) for further information.
 * There's also:
   - Forward substitution: `forward_substitution!(y, LU, b)` solves `L\b` and stores the solution in y.
-  - Backward substitution: `backward_substitution!(x, LU, y)` solves `U\y` and stores the solution in y.
-  - Nonzero count: `nnz(LU)` will return the number of nonzero entries in `LU`
+  - Backward substitution: `backward_substitution!(x, LU, y)` solves `U\y` and stores the solution in x.
+  - Nonzero count: `nnz(LU)` will return the number of nonzero entries in `LU`.
 
 ## Performance
 
