@@ -6,7 +6,7 @@ import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
 export ILU0Precon, \, forward_substitution!, backward_substitution!, nnz, ldiv!, ilu0, ilu0!
 
 # ILU0 type definition
-struct ILU0Precon{T <: Real,N <: Integer} <: Factorization{T}
+struct ILU0Precon{T <: Any,N <: Integer} <: Factorization{T}
     m::N
     n::N
     l_colptr::Vector{N}
@@ -21,7 +21,7 @@ struct ILU0Precon{T <: Real,N <: Integer} <: Factorization{T}
 end
 
 # Allocates ILU0Precon type
-function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T <: Real,N <: Integer}
+function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
     m, n = size(A)
 
     # Determine number of elements in lower/upper
@@ -75,7 +75,7 @@ function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T <: Real,N <: Integer}
 end
 
 # Updates ILU0Precon type in-place based on matrix A
-function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Real,N <: Integer}
+function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
     m = LU.m
     n = LU.n
     l_colptr = LU.l_colptr
@@ -131,14 +131,14 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Real,N 
 end
 
 # Constructs ILU0Precon type based on matrix A
-function ilu0(A::SparseMatrixCSC{T,N}) where {T <: Real,N <: Integer}
+function ilu0(A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
     LU = ILU0Precon(A)
     ilu0!(LU, A)
     return LU
 end
 
 # Solves L\b and stores the solution in y
-function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Real,N <: Integer}
+function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Any,N <: Integer}
     n = LU.n
     l_colptr = LU.l_colptr
     l_rowval = LU.l_rowval
@@ -156,7 +156,7 @@ function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::Abs
 end
 
 # Solves U\y and stores the solution in x
-function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T <: Real,N <: Integer}
+function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T <: Any,N <: Integer}
     n = LU.n
     u_colptr = LU.u_colptr
     u_rowval = LU.u_rowval
@@ -175,7 +175,7 @@ function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::Ab
 end
 
 # Solves LU\b overwriting x
-function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Real,N <: Integer}
+function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Any,N <: Integer}
     (length(b) == LU.n) || throw(DimensionMismatch())
     n = LU.n
     l_colptr = LU.l_colptr
@@ -204,19 +204,19 @@ function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) 
 end
 
 # Solves LU\b overwriting b
-function ldiv!(LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Real,N <: Integer}
+function ldiv!(LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Any,N <: Integer}
     ldiv!(b, LU, b)
 end
 
 # Returns LU\b
-function \(LU::ILU0Precon{T,N}, b::Vector{T}) where {T <: Real,N <: Integer}
+function \(LU::ILU0Precon{T,N}, b::Vector{T}) where {T <: Any,N <: Integer}
     length(b) == LU.n || throw(DimensionMismatch())
     x = zeros(T, length(b))
     ldiv!(x, LU, b)
 end
 
 # Returns the number of nonzero
-function nnz(LU::ILU0Precon{T,N}) where {T <: Real,N <: Integer}
+function nnz(LU::ILU0Precon{T,N}) where {T <: Any,N <: Integer}
     return length(LU.l_nzval) + length(LU.u_nzval)
 end
 
