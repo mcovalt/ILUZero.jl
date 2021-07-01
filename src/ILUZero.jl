@@ -144,7 +144,9 @@ function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::Abs
     l_rowval = LU.l_rowval
     l_nzval  = LU.l_nzval
 
-    y .= zero(T)
+    for i in eachindex(wrk)
+        wrk[i] = zero(M)
+    end
 
     @inbounds for i = 1:n
         y[i] += b[i]
