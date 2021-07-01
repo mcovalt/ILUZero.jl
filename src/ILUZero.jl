@@ -6,7 +6,7 @@ import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
 export ILU0Precon, \, forward_substitution!, backward_substitution!, nnz, ldiv!, ilu0, ilu0!
 
 # ILU0 type definition
-struct ILU0Precon{T <: Any,N <: Integer} <: Factorization{T}
+struct ILU0Precon{T <: Any, N <: Integer, M<: Any} <: Factorization{T}
     m::N
     n::N
     l_colptr::Vector{N}
@@ -17,11 +17,11 @@ struct ILU0Precon{T <: Any,N <: Integer} <: Factorization{T}
     u_nzval::Vector{T}
     l_map::Vector{N}
     u_map::Vector{N}
-    wrk::Vector{T}
+    wrk::Vector{M}
 end
 
 # Allocates ILU0Precon type
-function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
+function ILU0Precon(A::SparseMatrixCSC{T,N}, b_type = T) where {T <: Any,N <: Integer}
     m, n = size(A)
 
     # Determine number of elements in lower/upper
@@ -46,7 +46,7 @@ function ILU0Precon(A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
     u_rowval = zeros(Int64, unz)
     l_map = Vector{N}(undef, lnz)
     u_map = Vector{N}(undef, unz)
-    wrk = zeros(T, n)
+    wrk = zeros(b_type, n)
     l_colptr[1] = 1
     u_colptr[1] = 1
 
@@ -131,8 +131,8 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
 end
 
 # Constructs ILU0Precon type based on matrix A
-function ilu0(A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
-    LU = ILU0Precon(A)
+function ilu0(A::SparseMatrixCSC{T,N}, arg...) where {T <: Any,N <: Integer}
+    LU = ILU0Precon(A, arg...)
     ilu0!(LU, A)
     return LU
 end
@@ -156,7 +156,7 @@ function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::Abs
 end
 
 # Solves U\y and stores the solution in x
-function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::AbstractVector{T}) where {T <: Any,N <: Integer}
+function backward_substitution!(x, LU::ILU0Precon, y)
     n = LU.n
     u_colptr = LU.u_colptr
     u_rowval = LU.u_rowval
@@ -166,7 +166,7 @@ function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::Ab
     wrk .= y
 
     @inbounds for i = n:-1:1
-        x[i] = wrk[i] / u_nzval[u_colptr[i + 1] - 1]
+        x[i] = u_nzval[u_colptr[i + 1] - 1] \ wrk[i]
         for j = u_colptr[i]:u_colptr[i + 1] - 2
             wrk[u_rowval[j]] -= u_nzval[j] * x[i]
         end
@@ -175,7 +175,7 @@ function backward_substitution!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, y::Ab
 end
 
 # Solves LU\b overwriting x
-function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Any,N <: Integer}
+function ldiv!(x::AbstractVector{M}, LU::ILU0Precon{T,N,M}, b::AbstractVector{M}) where {T,N <: Integer,M}
     (length(b) == LU.n) || throw(DimensionMismatch())
     n = LU.n
     l_colptr = LU.l_colptr
@@ -186,7 +186,9 @@ function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) 
     u_nzval = LU.u_nzval
     wrk = LU.wrk
 
-    wrk .= zero(T)
+    for i in eachindex(wrk)
+        wrk[i] = zero(M)
+    end
 
     @inbounds for i = 1:n
         wrk[i] += b[i]
@@ -195,7 +197,7 @@ function ldiv!(x::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) 
         end
     end
     @inbounds for i = n:-1:1
-        x[i] = wrk[i] / u_nzval[u_colptr[i + 1] - 1]
+        x[i] = u_nzval[u_colptr[i + 1] - 1] \ wrk[i]
         for j = u_colptr[i]:u_colptr[i + 1] - 2
             wrk[u_rowval[j]] -= u_nzval[j] * x[i]
         end
