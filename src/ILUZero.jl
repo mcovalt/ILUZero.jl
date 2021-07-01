@@ -138,12 +138,13 @@ function ilu0(A::SparseMatrixCSC{T,N}, arg...) where {T <: Any,N <: Integer}
 end
 
 # Solves L\b and stores the solution in y
-function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N}, b::AbstractVector{T}) where {T <: Any,N <: Integer}
+function forward_substitution!(y::AbstractVector{T}, LU::ILU0Precon{T,N,M}, b::AbstractVector{T}) where {T, N <: Integer, M}
     n = LU.n
     l_colptr = LU.l_colptr
     l_rowval = LU.l_rowval
     l_nzval  = LU.l_nzval
 
+    wrk = LU.wrk
     for i in eachindex(wrk)
         wrk[i] = zero(M)
     end
