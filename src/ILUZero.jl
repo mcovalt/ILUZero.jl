@@ -98,9 +98,9 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
 
 
     @inbounds for i = 1:m - 1
-        multiplier = u_nzval[u_colptr[i + 1] - 1]
+        m_inv = inv(u_nzval[u_colptr[i + 1] - 1])
         for j = l_colptr[i]:l_colptr[i + 1] - 1
-            l_nzval[j] /= multiplier
+            l_nzval[j] = m_inv * l_nzval[j]
         end
         for j = u_colptr[i + 1]:u_colptr[i + 2] - 2
             multiplier = u_nzval[j]
