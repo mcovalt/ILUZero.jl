@@ -112,7 +112,7 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
                     qn += 1
                 end
                 if qn < u_colptr[i + 2] && l_rowval[pn] == u_rowval[qn]
-                    u_nzval[qn] -= multiplier * l_nzval[pn]
+                    u_nzval[qn] -= l_nzval[pn] * multiplier
                 end
                 pn += 1
             end
@@ -121,7 +121,7 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
                     rn += 1
                 end
                 if rn < l_colptr[i + 2] && l_rowval[pn] == l_rowval[rn]
-                    l_nzval[rn] -= multiplier * l_nzval[pn]
+                    l_nzval[rn] -= l_nzval[pn] * multiplier
                 end
                 pn += 1
             end
