@@ -15,9 +15,13 @@ pkg> add ILUZero
 
 ## Why use ILUZero.jl?
 
-You probably shouldn't. Julia's built in factorization methods are much better. Julia uses [SuiteSparse](http://faculty.cse.tamu.edu/davis/suitesparse.html) for sparse matrix factorization which factorizes at about nearly the same speed and results in similarly sized preconditioners which are *much* more robust. In addition, Julia uses heuristics to determine a good factorization scheme for your matrix automatically.
+This package was created to exploit some specific properties of a problem I had:
+- the non-zero elements of the matrix were frequently updated
+- an approximation of the matrix inverse was needed each time the non-zero elements were changed
+- the sparsity structure of the matrix was never altered
+- the non-zero elements of the matrix weren't necessarily floating point numbers
 
-Due to the zero-fill of this package, however, factorization should be a bit faster and preconditioners can be preallocated if updated by a matrix of identical sparsity.
+The ILU(0) preconditioner was a great solution for this problem. The method is simple enough to write a performant version purely in Julia. This allowed using Julia's flexible type system. Also, ILU(0) has constant memory requirements so the updating matrix could re-use previously allocated structures. Win win (win win)!
 
 ## How to use
 
