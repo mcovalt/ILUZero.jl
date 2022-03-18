@@ -1,6 +1,6 @@
 # ILUZero.jl
 
-`ILUZero.jl` is a Julia implementation of incomplete LU factorization with zero level of fill-in. It allows for non-allocating updates of the factorization. The module is compatible with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl).
+`ILUZero.jl` is a Julia implementation of incomplete LU factorization with zero level of fill-in. It allows for non-allocating updates of the factorization.
 
 ## Requirements
 
