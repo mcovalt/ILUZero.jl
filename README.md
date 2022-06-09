@@ -21,7 +21,9 @@ This package was created to exploit some specific properties of a problem I had:
 - the sparsity structure of the matrix was never altered
 - the non-zero elements of the matrix weren't necessarily floating point numbers
 
-The ILU(0) preconditioner was a great solution for this problem. The method is simple enough to write a performant version purely in Julia. This allowed using Julia's flexible type system. Also, ILU(0) has constant memory requirements so the updating matrix could re-use previously allocated structures. Win win (win win)!
+The ILU(0) preconditioner was a great solution for this problem. The method is simple enough to write a performant version purely in Julia. This allowed using Julia's flexible type system. Also, ILU(0) has constant memory requirements so the updating matrix could re-use previously allocated structures. Win win (win win)! Hint: take a look at [ConjugateGradients.jl](https://github.com/mcovalt/ConjugateGradients.jl) if this type of preconditioner would be beneficial to your project. Combined, these packages can help reduce allocations in those hot paths.
+
+
 
 ## How to use
 
