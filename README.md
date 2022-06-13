@@ -48,7 +48,7 @@ julia> using ILUZero
 julia> using BenchmarkTools, LinearAlgebra, SparseArrays
 julia> A = sprand(1000, 1000, 5 / 1000) + 10I
 julia> fact = @btime ilu0(A)
-       107.600 μs (16 allocations: 160.81 KiB)
+       119.475 μs (21 allocations: 165.31 KiB)
 julia> updated_fact = @btime ilu0!($fact, $A)
-       71.500 μs (0 allocations: 0 bytes)
+       83.079 μs (0 allocations: 0 bytes)
 ```
