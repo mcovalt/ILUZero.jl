@@ -1,5 +1,6 @@
 module ILUZero
 using LinearAlgebra, SparseArrays
+using SparseArrays: AbstractSparseMatrixCSC, nonzeros, rowvals, getcolptr
 
 import LinearAlgebra.ldiv!, LinearAlgebra.\, SparseArrays.nnz
 
@@ -21,15 +22,17 @@ struct ILU0Precon{T <: Any, N <: Integer, M<: Any} <: Factorization{T}
 end
 
 # Allocates ILU0Precon type
-function ILU0Precon(A::SparseMatrixCSC{T,N}, b_type = T) where {T <: Any,N <: Integer}
+function ILU0Precon(A::AbstractSparseMatrixCSC{T,N}, b_type = T) where {T <: Any,N <: Integer}
     m, n = size(A)
-
+    a_colptr=getcolptr(A)
+    a_rowval=rowvals(A)
+    
     # Determine number of elements in lower/upper
     lnz = 0
     unz = 0
     @inbounds for i = 1:n
-        for j = A.colptr[i]:A.colptr[i + 1] - 1
-            if A.rowval[j] > i
+        for j = a_colptr[i]:a_colptr[i + 1] - 1
+            if a_rowval[j] > i
                 lnz += 1
             else
                 unz += 1
@@ -56,15 +59,15 @@ function ILU0Precon(A::SparseMatrixCSC{T,N}, b_type = T) where {T <: Any,N <: In
     @inbounds for i = 1:n
         l_colptr[i + 1] = l_colptr[i]
         u_colptr[i + 1] = u_colptr[i]
-        for j = A.colptr[i]:A.colptr[i + 1] - 1
-            if A.rowval[j] > i
+        for j = a_colptr[i]:a_colptr[i + 1] - 1
+            if a_rowval[j] > i
                 l_colptr[i + 1] += 1
-                l_rowval[lit] = A.rowval[j]
+                l_rowval[lit] = a_rowval[j]
                 l_map[lit] = j
                 lit += 1
             else
                 u_colptr[i + 1] += 1
-                u_rowval[uit] = A.rowval[j]
+                u_rowval[uit] = a_rowval[j]
                 u_map[uit] = j
                 uit += 1
             end
@@ -75,7 +78,11 @@ function ILU0Precon(A::SparseMatrixCSC{T,N}, b_type = T) where {T <: Any,N <: In
 end
 
 # Updates ILU0Precon type in-place based on matrix A
-function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
+function ilu0!(LU::ILU0Precon{T,N}, A::AbstractSparseMatrixCSC{T,N}) where {T <: Any,N <: Integer}
+    a_colptr=getcolptr(A)
+    a_rowval=rowvals(A)
+    a_nzval=nonzeros(A)
+    
     m = LU.m
     n = LU.n
     l_colptr = LU.l_colptr
@@ -90,10 +97,10 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
     # Redundant data or better speed... speed is chosen, but this might be changed.
     # This shouldn't be inbounded either.
     for i = 1:length(l_map)
-        l_nzval[i] = A.nzval[l_map[i]]
+        l_nzval[i] = a_nzval[l_map[i]]
     end
     for i = 1:length(u_map)
-        u_nzval[i] = A.nzval[u_map[i]]
+        u_nzval[i] = a_nzval[u_map[i]]
     end
 
 
@@ -131,7 +138,7 @@ function ilu0!(LU::ILU0Precon{T,N}, A::SparseMatrixCSC{T,N}) where {T <: Any,N <
 end
 
 # Constructs ILU0Precon type based on matrix A
-function ilu0(A::SparseMatrixCSC{T,N}, arg...) where {T <: Any,N <: Integer}
+function ilu0(A::AbstractSparseMatrixCSC{T,N}, arg...) where {T <: Any,N <: Integer}
     LU = ILU0Precon(A, arg...)
     ilu0!(LU, A)
     return LU
